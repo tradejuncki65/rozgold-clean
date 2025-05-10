@@ -2,26 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Roz Gold App</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <title>Roz Gold – Trade Gold Instantly</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body style="background-color:#fffbe6; color:#333;">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">Roz Gold</a>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Roz Gold</h1>
+      <p>Buy, Sell & Invest in Digital Gold Instantly.</p>
+      <div class="cta-buttons">
+        <a href="/register" class="btn gold">Get Started</a>
+        <a href="/login" class="btn outline">Login</a>
+      </div>
     </div>
-  </nav>
+  </header>
 
-  <div class="container text-center mt-5">
-    <h1>Welcome to Roz Gold</h1>
-    <p>Trade, invest, and track gold securely and easily from anywhere.</p>
-    <a href="/dashboard" class="btn btn-warning">Go to Dashboard</a>
-  </div>
+  <section class="stats">
+    <div class="stat">
+      <h2>12,840+</h2>
+      <p>Active Investors</p>
+    </div>
+    <div class="stat">
+      <h2>$2.3M+</h2>
+      <p>Gold Traded</p>
+    </div>
+    <div class="stat">
+      <h2>3,900</h2>
+      <p>Wallets Linked</p>
+    </div>
+  </section>
 
-  <footer class="text-center mt-5 mb-3 text-muted">
-    &copy; 2025 Roz Gold App
+  <footer class="footer">
+    <p>© 2025 Roz Gold. All rights reserved.</p>
   </footer>
 </body>
 </html>
+
 
