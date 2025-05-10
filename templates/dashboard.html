@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard – Roz Gold</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <title>Dashboard – Roz Gold</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    {% include 'partials/navbar.html' %}
 
-  {% include 'partials/navbar.html' %}
+    <div class="dashboard-container">
+        <h2>Welcome, {{ user.username }}</h2>
+        <div class="dashboard-card">
+            <p><strong>Plan:</strong> {{ user.plan or 'Free' }}</p>
+            <p><strong>Wallet Address:</strong> {{ user.wallet_address or 'Not set yet' }}</p>
+            <p><strong>Returns:</strong> ${{ "%.2f" | format(user.returns or 0.0) }}</p>
+        </div>
 
-  <div class="container" style="max-width: 700px; margin: 60px auto; color: #fff;">
-    <h2>Welcome, {{ user.username }}</h2>
-    <p><strong>Plan:</strong> {{ user.plan or 'Free' }}</p>
-    <p><strong>Wallet Address:</strong> {{ user.wallet or 'Not set yet' }}</p>
-    <p><strong>Returns:</strong> ${{ user.returns or '0.00' }}</p>
+        <div class="dashboard-actions">
+            <a href="{{ url_for('account') }}" class="btn btn-outline-warning">Edit Account</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
 
-    <a href="/logout" class="btn outline" style="margin-top: 20px;">Logout</a>
-  </div>
-<a href="{{ url_for('account') }}" class="btn btn-outline-warning">Edit Account</a>
-
-  {% include 'partials/footer.html' %}
-
+    {% include 'partials/footer.html' %}
 </body>
 </html>
+
 
 
