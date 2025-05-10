@@ -2,27 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Account – Roz Gold</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <title>Edit Account – Roz Gold</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
   {% include 'partials/navbar.html' %}
 
-  <div class="container" style="max-width: 500px; color: #fff;">
-    <h2>Manage Your Account</h2>
-    <form method="POST">
-      <label>Wallet Address</label>
+  <div class="container" style="max-width: 500px; margin-top: 60px;">
+    <h2 class="text-center" style="color: #FFD700;">Manage Your Account</h2>
+
+    <form method="POST" style="margin-top: 30px;">
+      <label for="wallet" style="color: #fff;">Wallet Address</label>
       <input type="text" name="wallet" class="input" value="{{ user.wallet_address or '' }}" required>
 
-      <label>Choose Your Plan</label>
-      <select name="plan" class="input" required>
+      <label for="plan" style="margin-top: 15px; color: #fff;">Choose Your Plan</label>
+      <select name="plan" class="input">
         <option value="Free" {% if user.plan == 'Free' %}selected{% endif %}>Free</option>
         <option value="Premium" {% if user.plan == 'Premium' %}selected{% endif %}>Premium</option>
         <option value="VIP" {% if user.plan == 'VIP' %}selected{% endif %}>VIP</option>
       </select>
 
-      <button type="submit" class="btn gold" style="margin-top: 15px;">Update Account</button>
+      <button type="submit" class="btn gold" style="margin-top: 20px;">Update Account</button>
+      <a href="{{ url_for('dashboard') }}" class="btn outline" style="margin-top: 10px; display: block; text-align: center;">← Back to Dashboard</a>
     </form>
   </div>
 
@@ -30,3 +32,4 @@
 
 </body>
 </html>
+
