@@ -41,6 +41,16 @@ def home():
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user)
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    if request.method == 'POST':
+        current_user.wallet_address = request.form['wallet']
+        current_user.plan = request.form['plan']
+        db.session.commit()
+        flash('Account updated successfully.')
+        return redirect(url_for('dashboard'))
+    return render_template('account.html', user=current_user)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
