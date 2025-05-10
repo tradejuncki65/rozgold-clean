@@ -2,34 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wallet Form – Roz Gold</title>
+  <title>Update Wallet – Roz Gold</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body style="background-color:#fffbe6; color:#333;">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">Roz Gold</a>
-    </div>
-  </nav>
-
-  <div class="container mt-5">
-    <h2>Wallet Information</h2>
-    <form>
+<body class="bg-light text-dark">
+  <div class="container mt-5" style="max-width: 500px;">
+    <h2 class="mb-4">Update Wallet Address</h2>
+    <form method="POST">
       <div class="mb-3">
-        <label for="walletAddress" class="form-label">Wallet Address</label>
-        <input type="text" class="form-control" id="walletAddress" placeholder="Enter your crypto wallet address">
+        <label for="wallet" class="form-label">Your Wallet Address</label>
+        <input type="text" name="wallet" class="form-control" value="{{ user.wallet_address or '' }}" required>
       </div>
-      <div class="mb-3">
-        <label for="userId" class="form-label">User ID</label>
-        <input type="text" class="form-control" id="userId" placeholder="Your Roz Gold user ID">
-      </div>
-      <button type="submit" class="btn btn-warning">Submit Wallet</button>
+      <button type="submit" class="btn btn-dark w-100">Save Wallet</button>
+      <p class="mt-3 text-center"><a href="/dashboard">← Back to Dashboard</a></p>
     </form>
   </div>
-
-  <footer class="text-center mt-5 mb-3 text-muted">
-    &copy; 2025 Roz Gold App
-  </footer>
 </body>
 </html>
