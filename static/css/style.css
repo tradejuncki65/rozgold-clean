@@ -73,3 +73,57 @@ body {
   font-size: 14px;
   color: #999;
 }
+/* ---------- Form Styling ---------- */
+.container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+  background-color: #111;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+}
+
+h2 {
+  color: #FFD700;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin: 10px 0 5px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #222;
+  color: #fff;
+  font-size: 14px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 5px #FFD700;
+}
+
+button.btn {
+  width: 100%;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #FFD700;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.btn:hover {
+  background-color: #e6c200;
+}
