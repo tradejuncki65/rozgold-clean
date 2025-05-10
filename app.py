@@ -1,71 +1,79 @@
-from flask import Flask, render_template, request
-from datetime import datetime, timedelta
-import uuid
-import json
-import os
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from models import db, User
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.secret_key = 'super_secret_key'
 
-USERS_FILE = 'users.json'
+db.init_app(app)
 
-if not os.path.exists(USERS_FILE):
-    with open(USERS_FILE, 'w') as f:
-        json.dump({}, f)
+login_manager = LoginManager()
+login_manager.login_view = 'login'
+login_manager.init_app(app)
 
-def load_users():
-    with open(USERS_FILE, 'r') as f:
-        return json.load(f)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
-def save_users(users):
-    with open(USERS_FILE, 'w') as f:
-        json.dump(users, f, indent=2)
+# ---------- Routes ----------
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-@app.route('/whitepaper')
-def whitepaper():
-    return render_template('whitepaper.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard')
+@login_required
 def dashboard():
-    users = load_users()
+    return render_template('dashboard.html', user=current_user)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
-        wallet = request.form.get('wallet')
-        referral = request.form.get('referral')
-        user_id = str(uuid.uuid4())
-        start_date = datetime.now()
-        end_date = start_date + timedelta(days=240)
+        username = request.form['username']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
 
-        users[user_id] = {
-            'wallet': wallet,
-            'referral': referral,
-            'tokens': 50 if referral else 0,
-            'start_date': start_date.strftime('%Y-%m-%d'),
-            'end_date': end_date.strftime('%Y-%m-%d'),
-            'referral_code': user_id[:8],
-            'referred_users': 0
-        }
+        if User.query.filter_by(email=email).first():
+            flash("Email already exists.")
+            return redirect(url_for('register'))
 
-        save_users(users)
-        return render_template('dashboard.html', user=users[user_id])
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
 
-    return render_template('wallet_form.html')
+        flash("Registration successful. Please log in.")
+        return redirect(url_for('login'))
 
-@app.route('/referral/<ref_code>')
-def referral_join(ref_code):
-    return render_template('wallet_form.html', ref_code=ref_code)
+    return render_template('register.html')
 
-import os
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Login failed. Check email or password.")
+
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+# Run the app locally
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
+
