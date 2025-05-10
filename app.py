@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from urllib.parse import urlparse, urljoin
 
 from models import db, User
 
@@ -19,9 +20,16 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# ✅ Ensure DB is created on startup (even on Render)
+# ✅ Ensure DB is created even on Render
 with app.app_context():
     db.create_all()
+
+# ---------- Utility ----------
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
 # ---------- Routes ----------
 
@@ -59,13 +67,19 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        next_page = request.form.get('next')
+
         user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password, password):
             login_user(user)
-            return redirect(url_for('dashboard'))
+            if next_page and is_safe_url(next_page):
+                return redirect(next_page)
+            else:
+                return redirect(url_for('dashboard'))
         else:
             flash("Login failed. Check email or password.")
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
@@ -75,9 +89,6 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# Only runs when testing locally
-if __name__ == '__main__':
-    app.run(debug=True)
 @app.route('/wallet', methods=['GET', 'POST'])
 @login_required
 def wallet():
@@ -89,5 +100,10 @@ def wallet():
         return redirect(url_for('dashboard'))
 
     return render_template('wallet_form.html', user=current_user)
+
+# ---------- Local Debug ----------
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
