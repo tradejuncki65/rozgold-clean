@@ -19,6 +19,10 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# ✅ Ensure DB is created on startup (even on Render)
+with app.app_context():
+    db.create_all()
+
 # ---------- Routes ----------
 
 @app.route('/')
@@ -71,9 +75,8 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# Run the app locally
+# Only runs when testing locally
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
+
 
