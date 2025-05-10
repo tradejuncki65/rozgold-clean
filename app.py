@@ -20,16 +20,16 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# ✅ Ensure DB is created even on Render
-with app.app_context():
-    db.create_all()
-
 # ---------- Utility ----------
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
+# ---------- Ensure DB is Created ----------
+with app.app_context():
+    db.create_all()
 
 # ---------- Routes ----------
 
@@ -41,6 +41,7 @@ def home():
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user)
+
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
@@ -48,8 +49,9 @@ def account():
         current_user.wallet_address = request.form['wallet']
         current_user.plan = request.form['plan']
         db.session.commit()
-        flash('Account updated successfully.')
+        flash("Account updated successfully.")
         return redirect(url_for('dashboard'))
+
     return render_template('account.html', user=current_user)
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -111,20 +113,10 @@ def wallet():
 
     return render_template('wallet_form.html', user=current_user)
 
-# ---------- Local Debug ----------
+# ---------- Run Local Server ----------
 if __name__ == '__main__':
     app.run(debug=True)
-@app.route('/account', methods=['GET', 'POST'])
-@login_required
-def account():
-    if request.method == 'POST':
-        current_user.wallet_address = request.form['wallet']
-        current_user.plan = request.form['plan']
-        db.session.commit()
-        flash("Account updated successfully.")
-        return redirect(url_for('dashboard'))
 
-    return render_template('account.html', user=current_user)
 
 
 
