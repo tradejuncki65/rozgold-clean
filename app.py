@@ -78,5 +78,16 @@ def logout():
 # Only runs when testing locally
 if __name__ == '__main__':
     app.run(debug=True)
+@app.route('/wallet', methods=['GET', 'POST'])
+@login_required
+def wallet():
+    if request.method == 'POST':
+        wallet_address = request.form['wallet']
+        current_user.wallet_address = wallet_address
+        db.session.commit()
+        flash("Wallet address updated successfully.")
+        return redirect(url_for('dashboard'))
+
+    return render_template('wallet_form.html', user=current_user)
 
 
