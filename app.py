@@ -209,6 +209,13 @@ def admin_kyc_action(user_id, action):
 def logout():
     logout_user()
     return redirect(url_for('login'))
+@app.route('/create-tables')
+def create_tables():
+    db.create_all()
+    return "Tables created!"
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 if __name__ == '__main__':
     app.run(debug=True)
