@@ -5,19 +5,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from config import Config
-from models import db, User, InvestmentPlan
+from models import db, User, InvestmentPlan, Investment
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 db.init_app(app)
+mail = Mail(app)
+s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
-
-mail = Mail(app)
-s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -35,21 +34,20 @@ def register():
         password = generate_password_hash(request.form['password'])
 
         if User.query.filter_by(email=email).first():
-            flash("Email already registered.")
+            flash("Email already exists.")
             return redirect(url_for('register'))
 
         user = User(username=username, email=email, password=password)
         db.session.add(user)
         db.session.commit()
 
-        # Send email confirmation
         token = s.dumps(email, salt='email-confirm')
         link = url_for('confirm_email', token=token, _external=True)
-        msg = Message('Confirm Your Email', sender='tradejunction65@gmail.com', recipients=[email])
+        msg = Message('Confirm Your Email', sender=app.config['MAIL_USERNAME'], recipients=[email])
         msg.body = f'Welcome to Roz Gold!\n\nPlease confirm your email: {link}'
         mail.send(msg)
 
-        flash("Registration successful! Please check your email to confirm.")
+        flash("Registration successful. Check your email to confirm.")
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -61,10 +59,10 @@ def confirm_email(token):
         if user:
             user.confirmed = True
             db.session.commit()
-            flash("Email confirmed. You may now log in.")
+            flash("Email confirmed. Please login.")
             return redirect(url_for('login'))
     except SignatureExpired:
-        flash("The confirmation link has expired.")
+        flash("Confirmation link expired.")
         return redirect(url_for('register'))
     flash("Invalid confirmation link.")
     return redirect(url_for('register'))
@@ -77,11 +75,11 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             if not user.confirmed:
-                flash("Please confirm your email first.")
+                flash("Please confirm your email.")
                 return redirect(url_for('login'))
             login_user(user)
             return redirect(url_for('dashboard'))
-        flash("Invalid credentials.")
+        flash("Invalid login.")
     return render_template('login.html')
 
 @app.route('/logout')
@@ -102,7 +100,7 @@ def account():
         current_user.wallet_address = request.form['wallet']
         current_user.plan = request.form['plan']
         db.session.commit()
-        flash('Account updated successfully.')
+        flash("Account updated.")
         return redirect(url_for('dashboard'))
     return render_template('account.html', user=current_user)
 
@@ -112,7 +110,7 @@ def kyc():
     if request.method == 'POST':
         current_user.kyc_status = 'Pending'
         db.session.commit()
-        flash("KYC submitted. Awaiting approval.")
+        flash("KYC submitted.")
         return redirect(url_for('dashboard'))
     return render_template('kyc.html', user=current_user)
 
@@ -134,7 +132,7 @@ def verify_kyc(user_id, status):
     user = User.query.get_or_404(user_id)
     user.kyc_status = status
     db.session.commit()
-    flash(f"KYC status updated to {status} for {user.username}.")
+    flash(f"KYC {status} for {user.username}")
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/investment-plans')
@@ -163,9 +161,41 @@ def add_plan():
         )
         db.session.add(new_plan)
         db.session.commit()
-        flash("Investment plan added.")
+        flash("Plan added.")
         return redirect(url_for('investment_plans'))
     return render_template('admin/add_plan.html')
+
+@app.route('/invest', methods=['GET', 'POST'])
+@login_required
+def invest():
+    plans = InvestmentPlan.query.all()
+    if request.method == 'POST':
+        selected_plan = InvestmentPlan.query.get(int(request.form['plan_id']))
+        amount = float(request.form['amount'])
+
+        if amount < selected_plan.min_amount or amount > selected_plan.max_amount:
+            flash("Amount out of allowed range.")
+            return redirect(url_for('invest'))
+
+        roi = selected_plan.roi
+        new_inv = Investment(
+            user_id=current_user.id,
+            plan=selected_plan.name,
+            amount=amount,
+            roi=roi
+        )
+        db.session.add(new_inv)
+        db.session.commit()
+        flash(f"Invested ${amount} in {selected_plan.name} plan.")
+        return redirect(url_for('my_investments'))
+
+    return render_template('invest.html', plans=plans)
+
+@app.route('/my-investments')
+@login_required
+def my_investments():
+    investments = Investment.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_investments.html', investments=investments)
 
 @app.route('/create-tables')
 def create_tables():
@@ -175,30 +205,6 @@ def create_tables():
 if __name__ == '__main__':
     app.run(debug=True)
 
-@app.route('/invest', methods=['GET', 'POST'])
-@login_required
-def invest():
-    plans = InvestmentPlan.query.all()
-
-    if request.method == 'POST':
-        selected_plan = InvestmentPlan.query.get(int(request.form['plan_id']))
-        amount = float(request.form['amount'])
-
-        if amount < selected_plan.min_amount or amount > selected_plan.max_amount:
-            flash("Amount not within allowed range.")
-            return redirect(url_for('invest'))
-
-        roi = selected_plan.roi
-        total_return = amount + (amount * roi / 100)
-
-        # Save to user's record or track separately
-        current_user.returns = total_return
-        db.session.commit()
-
-        flash(f"You've successfully invested ${amount} in the {selected_plan.name} plan!")
-        return redirect(url_for('dashboard'))
-
-    return render_template('invest.html', plans=plans)
 
 
 
