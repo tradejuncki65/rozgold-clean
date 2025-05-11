@@ -2,46 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Roz Gold – Trade Gold Instantly</title>
+  <title>Roz Gold – Trade Digital Gold</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
   {% include 'partials/navbar.html' %}
 
-  <header class="hero">
+  <!-- Hero Section -->
+  <section class="hero">
     <div class="hero-content">
       <h1>Roz Gold</h1>
       <p>Buy, Sell & Invest in Digital Gold Instantly.</p>
-      <div class="cta-buttons">
-        <a href="/register" class="btn gold">Get Started</a>
-        <a href="/login" class="btn outline">Login</a>
+      <div class="hero-buttons">
+        <a href="{{ url_for('register') }}" class="btn gold">Get Started</a>
+        <a href="{{ url_for('login') }}" class="btn outline">Login</a>
       </div>
     </div>
-  </header>
+  </section>
 
+  <!-- Stats Section -->
   <section class="stats">
     <div class="stat">
-      <h2>12,840+</h2>
+      <h3>12,840+</h3>
       <p>Active Investors</p>
     </div>
     <div class="stat">
-      <h2>$2.3M+</h2>
+      <h3>$2.3M+</h3>
       <p>Gold Traded</p>
     </div>
     <div class="stat">
-      <h2>3,900</h2>
+      <h3>3,900</h3>
       <p>Wallets Linked</p>
     </div>
+  </section>
+
+  <!-- Investment Packages -->
+  <section class="packages">
+    <h2 class="section-title">Investment Packages</h2>
+    <div class="package-cards">
+
+      <div class="card">
+        <h3>Free Plan</h3>
+        <p>8-Month Contract</p>
+        <p><strong>ROI: 20%</strong></p>
+        <p>No upfront cost. Basic returns. Ideal for new users.</p>
+        <a href="{{ url_for('register') }}" class="btn outline">Start Free</a>
+      </div>
+
+      <div class="card highlight">
+        <h3>Premium Plan</h3>
+        <p>8-Month Contract</p>
+        <p><strong>ROI: 40%</strong></p>
+        <p>Mid-level investment. Higher profit potential.</p>
+        <a href="{{ url_for('register') }}" class="btn gold">Invest Now</a>
+      </div>
+
+      <div class="card">
+        <h3>VIP Plan</h3>
+        <p>8-Month Contract</p>
+        <p><strong>ROI: 60%</strong></p>
+        <p>Maximum return plan. Priority support & tracking.</p>
+        <a href="{{ url_for('register') }}" class="btn outline">Join VIP</a>
+      </div>
+
+    </div>
+    <p class="package-note">🎯 After 8 months, 100% of profits go to the investor. Roz Gold holds no ownership.</p>
   </section>
 
   {% include 'partials/footer.html' %}
 
 </body>
 </html>
+
 
 
 
