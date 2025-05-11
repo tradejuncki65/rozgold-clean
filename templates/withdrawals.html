@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Withdrawal Requests</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Plan</th>
+      <th>Amount ($)</th>
+      <th>ROI (%)</th>
+      <th>Requested On</th>
+      <th>Due Date</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inv in requests %}
+    <tr>
+      <td>{{ inv.user.username }}</td>
+      <td>{{ inv.plan }}</td>
+      <td>{{ "%.2f"|format(inv.amount) }}</td>
+      <td>{{ inv.roi }}</td>
+      <td>{{ inv.created_at.strftime('%Y-%m-%d') }}</td>
+      <td>{{ inv.due_date.strftime('%Y-%m-%d') }}</td>
+      <td>{{ inv.status() }}</td>
+      <td>
+        {% if not inv.is_withdrawn %}
+        <form action="{{ url_for('complete_withdrawal', investment_id=inv.id) }}" method="POST">
+          <button type="submit">Mark as Paid</button>
+        </form>
+        {% else %}
+          ✅ Completed
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No withdrawal requests.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
