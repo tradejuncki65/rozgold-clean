@@ -1,30 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard – Roz Gold</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <title>Dashboard – Roz Gold</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    {% include 'partials/navbar.html' %}
+  {% include 'partials/navbar.html' %}
 
-    <div class="dashboard-container">
-        <h2>Welcome, {{ user.username }}</h2>
-        <div class="dashboard-card">
-            <p><strong>Plan:</strong> {{ user.plan or 'Free' }}</p>
-            <p><strong>Wallet Address:</strong> {{ user.wallet_address or 'Not set yet' }}</p>
-            <p><strong>Returns:</strong> ${{ "%.2f" | format(user.returns or 0.0) }}</p>
-        </div>
+  <div class="container" style="max-width: 700px; margin: 60px auto; color: #fff;">
+    <div style="background: #111; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px #000;">
+      <h2 style="color: gold; text-align: center;">Welcome, {{ user.username }}</h2>
 
-        <div class="dashboard-actions">
-            <a href="{{ url_for('account') }}" class="btn btn-outline-warning">Edit Account</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
-        </div>
+      <p><strong>Plan:</strong> {{ user.plan or 'Free' }}</p>
+      <p><strong>Wallet Address:</strong> {{ user.wallet_address or 'Not set yet' }}</p>
+      <p><strong>Returns:</strong> ${{ "%.2f"|format(user.returns or 0.0) }}</p>
+
+      <div style="margin-top: 20px;">
+        <a href="{{ url_for('account') }}" class="btn btn-outline-warning">Edit Account</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger" style="margin-left: 10px;">Logout</a>
+      </div>
     </div>
+  </div>
 
-    {% include 'partials/footer.html' %}
+  {% include 'partials/footer.html' %}
 </body>
 </html>
+
 
 
 
