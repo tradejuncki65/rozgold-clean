@@ -198,6 +198,23 @@ def invest():
 
     return render_template('invest.html', plans=plans)
 
+@app.route('/request-withdrawal/<int:investment_id>', methods=['POST'])
+@login_required
+def request_withdrawal(investment_id):
+    investment = Investment.query.get_or_404(investment_id)
+
+    if investment.user_id != current_user.id:
+        flash("Unauthorized action.")
+        return redirect(url_for('my_investments'))
+
+    if investment.status() == "Matured" and not investment.is_withdrawal_requested:
+        investment.is_withdrawal_requested = True
+        db.session.commit()
+        flash("Withdrawal request submitted.")
+    else:
+        flash("This investment is not eligible for withdrawal.")
+
+    return redirect(url_for('my_investments'))
 
 
 
