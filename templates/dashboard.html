@@ -1,31 +1,38 @@
+<!-- templates/dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Dashboard – Roz Gold</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   {% include 'partials/navbar.html' %}
+  <div class="container" style="margin-top: 40px;">
+    <h2>Welcome, {{ user.username }} 👋</h2>
 
-  <div class="container" style="max-width: 700px; margin: 60px auto; color: #fff;">
-    <div style="background: #111; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px #000;">
-      <h2 style="color: gold; text-align: center;">Welcome, {{ user.username }}</h2>
+    <div class="info-box">
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Wallet:</strong> {{ user.wallet_address or "Not added" }}</p>
+      <p><strong>Plan:</strong> {{ user.plan or "Free" }}</p>
+      <p><strong>Expected Returns:</strong> ${{ user.returns or 0.0 }}</p>
+      <p><strong>KYC Status:</strong> 
+        <span style="color: {% if user.kyc_status == 'Approved' %}green{% elif user.kyc_status == 'Rejected' %}red{% else %}orange{% endif %};">
+          {{ user.kyc_status }}
+        </span>
+      </p>
+    </div>
 
-      <p><strong>Plan:</strong> {{ user.plan or 'Free' }}</p>
-      <p><strong>Wallet Address:</strong> {{ user.wallet_address or 'Not set yet' }}</p>
-      <p><strong>Returns:</strong> ${{ "%.2f"|format(user.returns or 0.0) }}</p>
-
-      <div style="margin-top: 20px;">
-        <a href="{{ url_for('account') }}" class="btn btn-outline-warning">Edit Account</a>
-        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger" style="margin-left: 10px;">Logout</a>
-      </div>
+    <div class="actions" style="margin-top: 20px;">
+      <a href="{{ url_for('account') }}" class="btn">Update Account</a>
+      <a href="{{ url_for('kyc') }}" class="btn">Submit KYC</a>
+      <a href="{{ url_for('logout') }}" class="btn" style="background: #c0392b;">Logout</a>
     </div>
   </div>
-
   {% include 'partials/footer.html' %}
 </body>
 </html>
+
 
 
 
