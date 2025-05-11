@@ -10,7 +10,7 @@
       <th>ROI (%)</th>
       <th>Invested On</th>
       <th>Due Date</th>
-      <th>Status</th>
+      <th>Status / Action</th>
     </tr>
   </thead>
   <tbody>
@@ -21,7 +21,14 @@
       <td>{{ inv.roi }}</td>
       <td>{{ inv.created_at.strftime('%Y-%m-%d') }}</td>
       <td>{{ inv.due_date.strftime('%Y-%m-%d') }}</td>
-      <td>{{ inv.status() }}</td>
+      <td>
+        {{ inv.status() }}
+        {% if inv.status() == "Matured" and not inv.is_withdrawal_requested %}
+          <form action="{{ url_for('request_withdrawal', investment_id=inv.id) }}" method="POST" style="margin-top:5px;">
+            <button type="submit">Request Withdrawal</button>
+          </form>
+        {% endif %}
+      </td>
     </tr>
     {% else %}
     <tr><td colspan="6">No investments yet.</td></tr>
@@ -29,3 +36,4 @@
   </tbody>
 </table>
 {% endblock %}
+
