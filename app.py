@@ -169,41 +169,35 @@ def add_plan():
 @login_required
 def invest():
     plans = InvestmentPlan.query.all()
+
     if request.method == 'POST':
         selected_plan = InvestmentPlan.query.get(int(request.form['plan_id']))
         amount = float(request.form['amount'])
 
         if amount < selected_plan.min_amount or amount > selected_plan.max_amount:
-            flash("Amount out of allowed range.")
+            flash("Amount not within allowed range.")
             return redirect(url_for('invest'))
 
         roi = selected_plan.roi
-        new_inv = Investment(
+        duration_days = selected_plan.duration_days
+        due_date = datetime.utcnow() + timedelta(days=duration_days)
+
+        new_investment = Investment(
             user_id=current_user.id,
             plan=selected_plan.name,
             amount=amount,
-            roi=roi
+            roi=roi,
+            due_date=due_date
         )
-        db.session.add(new_inv)
+
+        db.session.add(new_investment)
         db.session.commit()
-        flash(f"Invested ${amount} in {selected_plan.name} plan.")
+
+        flash(f"You’ve successfully invested ${amount} in {selected_plan.name} plan. ROI will mature in {duration_days} days.")
         return redirect(url_for('my_investments'))
 
     return render_template('invest.html', plans=plans)
 
-@app.route('/my-investments')
-@login_required
-def my_investments():
-    investments = Investment.query.filter_by(user_id=current_user.id).all()
-    return render_template('my_investments.html', investments=investments)
-
-@app.route('/create-tables')
-def create_tables():
-    db.create_all()
-    return "Tables created!"
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
 
