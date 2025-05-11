@@ -30,12 +30,50 @@
     .action-links a.reject {
       color: #e74c3c;
     }
+    .summary-boxes {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .summary-box {
+      background: #222;
+      padding: 15px;
+      border: 2px solid #FFD700;
+      width: 23%;
+      text-align: center;
+      color: #fff;
+      font-size: 1.1em;
+    }
+    .summary-box h4 {
+      margin: 0;
+      font-size: 1.2em;
+      color: #FFD700;
+    }
   </style>
 </head>
 <body>
   {% include 'partials/navbar.html' %}
   <div class="container">
     <h2>Admin Panel – User Management</h2>
+
+    <div class="summary-boxes">
+      <div class="summary-box">
+        <h4>Total Users</h4>
+        <p>{{ total_users }}</p>
+      </div>
+      <div class="summary-box">
+        <h4>KYC Approved</h4>
+        <p>{{ kyc_approved }}</p>
+      </div>
+      <div class="summary-box">
+        <h4>KYC Pending</h4>
+        <p>{{ kyc_pending }}</p>
+      </div>
+      <div class="summary-box">
+        <h4>Total Returns</h4>
+        <p>${{ "%.2f"|format(total_returns) }}</p>
+      </div>
+    </div>
 
     <table>
       <thead>
@@ -81,4 +119,7 @@
   </div>
 </body>
 </html>
+
+
+       
 
