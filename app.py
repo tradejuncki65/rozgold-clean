@@ -213,6 +213,10 @@ def logout():
 def create_tables():
     db.create_all()
     return "Tables created!"
+@app.route('/create-investment-plans-table')
+def create_investment_plans_table():
+    db.create_all()
+    return "InvestmentPlans table created!"
 
 if __name__ == '__main__':
     app.run(debug=True)
