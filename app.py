@@ -121,8 +121,26 @@ def admin_dashboard():
     if not current_user.is_admin:
         flash("Access denied.")
         return redirect(url_for('dashboard'))
+
     users = User.query.all()
-    return render_template('admin/dashboard.html', users=users)
+    total_users = len(users)
+    kyc_pending = User.query.filter_by(kyc_status='Pending').count()
+    kyc_approved = User.query.filter_by(kyc_status='Approved').count()
+
+    total_invested = db.session.query(db.func.sum(Investment.amount)).scalar() or 0
+    active_investments = Investment.query.filter(Investment.is_withdrawn == False).count()
+    pending_withdrawals = Investment.query.filter_by(is_withdrawal_requested=True).count()
+
+    return render_template('admin/dashboard.html',
+        total_users=total_users,
+        kyc_pending=kyc_pending,
+        kyc_approved=kyc_approved,
+        total_invested=total_invested,
+        active_investments=active_investments,
+        pending_withdrawals=pending_withdrawals,
+        users=users
+    )
+
 
 @app.route('/admin/verify/<int:user_id>/<status>')
 @login_required
