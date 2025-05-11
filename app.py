@@ -5,28 +5,27 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-from urllib.parse import urlparse, urljoin
 import os
 
 from config import Config
 from models import db, User
 
-# -------------------- INIT --------------------
+# App and Config
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 mail = Mail(app)
 
+# Login setup
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
-# -------------------- FILE UPLOAD CONFIG --------------------
+# Upload config
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# -------------------- UTILS --------------------
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -54,7 +53,6 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-# -------------------- ROUTES --------------------
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -136,24 +134,43 @@ def account():
 @login_required
 def kyc():
     if request.method == 'POST':
-        id_doc = request.files['id_doc']
-        selfie = request.files['selfie']
+        full_name = request.form['full_name']
+        national_id = request.form['national_id']
+        country = request.form['country']
 
-        if id_doc and allowed_file(id_doc.filename) and selfie and allowed_file(selfie.filename):
-            id_filename = secure_filename(f"{current_user.id}_id_{id_doc.filename}")
-            selfie_filename = secure_filename(f"{current_user.id}_selfie_{selfie.filename}")
-            id_path = os.path.join(app.config['UPLOAD_FOLDER'], id_filename)
-            selfie_path = os.path.join(app.config['UPLOAD_FOLDER'], selfie_filename)
-            id_doc.save(id_path)
-            selfie.save(selfie_path)
+        current_user.full_name = full_name
+        current_user.national_id = national_id
+        current_user.country = country
+        current_user.kyc_status = 'Pending'
+        db.session.commit()
+        flash("KYC submitted successfully.")
+        return redirect(url_for('dashboard'))
 
-            current_user.kyc_status = 'Pending'
-            db.session.commit()
-            flash('KYC submitted. Awaiting review.')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid file type.')
     return render_template('kyc.html', user=current_user)
+
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash("Access denied.")
+        return redirect(url_for('dashboard'))
+    users = User.query.order_by(User.kyc_status).all()
+    return render_template('admin.html', users=users)
+
+@app.route('/admin/kyc/<int:user_id>/<action>')
+@login_required
+def admin_kyc_action(user_id, action):
+    if not current_user.is_admin:
+        flash("Access denied.")
+        return redirect(url_for('dashboard'))
+    user = User.query.get_or_404(user_id)
+    if action == 'approve':
+        user.kyc_status = 'Approved'
+    elif action == 'reject':
+        user.kyc_status = 'Rejected'
+    db.session.commit()
+    flash(f"KYC status updated to {user.kyc_status} for {user.username}.")
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/logout')
 @login_required
@@ -161,9 +178,9 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-# -------------------- LOCAL DEBUG --------------------
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
