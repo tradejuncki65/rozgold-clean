@@ -9,24 +9,29 @@
 
   {% include 'partials/navbar.html' %}
 
-  <div class="container" style="max-width: 400px; margin: 50px auto; color: #fff;">
-    <h2>Create Your Roz Gold Account</h2>
+  <div class="container">
+    <h2 style="color: #FFD700;">Create Your Roz Gold Account</h2>
     <form method="POST">
-      <label>Username:</label>
-      <input type="text" name="username" required class="input">
-      
-      <label>Email:</label>
-      <input type="email" name="email" required class="input">
-      
-      <label>Password:</label>
-      <input type="password" name="password" required class="input">
-      
-      <button type="submit" class="btn gold" style="margin-top: 15px;">Register</button>
+      <label>Username</label>
+      <input type="text" name="username" required>
+
+      <label>Email</label>
+      <input type="email" name="email" required>
+
+      <label>Password</label>
+      <input type="password" name="password" required>
+
+      <button type="submit">Register</button>
     </form>
+    <p style="text-align:center; margin-top: 10px;">
+      Already have an account? <a href="{{ url_for('login') }}">Login</a>
+    </p>
   </div>
 
   {% include 'partials/footer.html' %}
 
 </body>
 </html>
+
+
 
