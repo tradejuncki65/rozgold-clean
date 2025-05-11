@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from config import Config
+from datetime import datetime, timedelta
 from models import db, User, InvestmentPlan, Investment
 
 app = Flask(__name__)
@@ -169,7 +170,6 @@ def add_plan():
 @login_required
 def invest():
     plans = InvestmentPlan.query.all()
-
     if request.method == 'POST':
         selected_plan = InvestmentPlan.query.get(int(request.form['plan_id']))
         amount = float(request.form['amount'])
@@ -178,25 +178,28 @@ def invest():
             flash("Amount not within allowed range.")
             return redirect(url_for('invest'))
 
-        roi = selected_plan.roi
-        duration_days = selected_plan.duration_days
-        due_date = datetime.utcnow() + timedelta(days=duration_days)
+        due_date = datetime.utcnow() + timedelta(days=selected_plan.duration_days)
 
         new_investment = Investment(
             user_id=current_user.id,
             plan=selected_plan.name,
             amount=amount,
-            roi=roi,
+            roi=selected_plan.roi,
             due_date=due_date
         )
 
         db.session.add(new_investment)
         db.session.commit()
-
-        flash(f"You’ve successfully invested ${amount} in {selected_plan.name} plan. ROI will mature in {duration_days} days.")
+        flash(f"Invested ${amount} in {selected_plan.name}. Matures in {selected_plan.duration_days} days.")
         return redirect(url_for('my_investments'))
 
     return render_template('invest.html', plans=plans)
+
+@app.route('/my-investments')
+@login_required
+def my_investments():
+    investments = Investment.query.filter_by(user_id=current_user.id).all()
+    return render_template('my_investments.html', investments=investments)
 
 @app.route('/request-withdrawal/<int:investment_id>', methods=['POST'])
 @login_required
@@ -212,9 +215,38 @@ def request_withdrawal(investment_id):
         db.session.commit()
         flash("Withdrawal request submitted.")
     else:
-        flash("This investment is not eligible for withdrawal.")
+        flash("Not eligible for withdrawal.")
 
     return redirect(url_for('my_investments'))
+
+@app.route('/admin/withdrawals')
+@login_required
+def admin_withdrawals():
+    if not current_user.is_admin:
+        flash("Access denied.")
+        return redirect(url_for('dashboard'))
+
+    requests = Investment.query.filter_by(is_withdrawal_requested=True).all()
+    return render_template('admin/withdrawals.html', requests=requests)
+
+@app.route('/admin/withdrawals/complete/<int:investment_id>', methods=['POST'])
+@login_required
+def complete_withdrawal(investment_id):
+    if not current_user.is_admin:
+        flash("Access denied.")
+        return redirect(url_for('dashboard'))
+
+    investment = Investment.query.get_or_404(investment_id)
+    investment.is_withdrawn = True
+    investment.is_withdrawal_requested = False
+    db.session.commit()
+
+    flash("Withdrawal marked as completed.")
+    return redirect(url_for('admin_withdrawals'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
 
