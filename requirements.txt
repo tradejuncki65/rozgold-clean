@@ -2,4 +2,5 @@ Flask
 gunicorn
 Flask-Login
 Flask-SQLAlchemy
+Flask-Mail
 
