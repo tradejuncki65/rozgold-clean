@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 import os
@@ -10,24 +9,15 @@ import os
 from config import Config
 from models import db, User
 
-# App and Config
+# App setup
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 mail = Mail(app)
 
-# Login setup
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
-
-# Upload config
-UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def generate_confirmation_token(email):
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -143,6 +133,14 @@ def kyc():
         current_user.country = country
         current_user.kyc_status = 'Pending'
         db.session.commit()
+
+        send_email(
+            to="tradejunction65@gmail.com",
+            subject="New KYC Submission – Roz Gold",
+            template="email/admin_kyc_alert.html",
+            user=current_user
+        )
+
         flash("KYC submitted successfully.")
         return redirect(url_for('dashboard'))
 
@@ -163,11 +161,25 @@ def admin_kyc_action(user_id, action):
     if not current_user.is_admin:
         flash("Access denied.")
         return redirect(url_for('dashboard'))
+
     user = User.query.get_or_404(user_id)
     if action == 'approve':
         user.kyc_status = 'Approved'
+        send_email(
+            to=user.email,
+            subject="KYC Approved – Roz Gold",
+            template="email/kyc_approved.html",
+            user=user
+        )
     elif action == 'reject':
         user.kyc_status = 'Rejected'
+        send_email(
+            to=user.email,
+            subject="KYC Rejected – Roz Gold",
+            template="email/kyc_rejected.html",
+            user=user
+        )
+
     db.session.commit()
     flash(f"KYC status updated to {user.kyc_status} for {user.username}.")
     return redirect(url_for('admin_dashboard'))
@@ -180,6 +192,7 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 
