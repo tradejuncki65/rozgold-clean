@@ -1,79 +1,86 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Roz Gold – Trade Digital Gold</title>
+  <title>Roz Gold – Smart Trading Platform</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .hero {
+      background: linear-gradient(to right, #000000, #111111);
+      color: #FFD700;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #ccc;
+      margin-bottom: 30px;
+    }
+    .hero .btn {
+      background: #FFD700;
+      color: #111;
+      padding: 12px 30px;
+      border: none;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    .features {
+      background: #1a1a1a;
+      color: #fff;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    .feature-box {
+      flex: 1 1 300px;
+      max-width: 320px;
+      margin: 20px;
+      padding: 20px;
+      border: 1px solid #333;
+      border-radius: 10px;
+      background: #111;
+    }
+    .feature-box h3 {
+      color: #FFD700;
+    }
+  </style>
 </head>
 <body>
 
   {% include 'partials/navbar.html' %}
 
-  <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-content">
-      <h1>Roz Gold</h1>
-      <p>Buy, Sell & Invest in Digital Gold Instantly.</p>
-      <div class="hero-buttons">
-        <a href="{{ url_for('register') }}" class="btn gold">Get Started</a>
-        <a href="{{ url_for('login') }}" class="btn outline">Login</a>
-      </div>
-    </div>
+    <h1>Welcome to Roz Gold</h1>
+    <p>The future of secure, transparent, and profitable gold trading</p>
+    <a href="{{ url_for('register') }}" class="btn">Get Started</a>
   </section>
 
-  <!-- Stats Section -->
-  <section class="stats">
-    <div class="stat">
-      <h3>12,840+</h3>
-      <p>Active Investors</p>
+  <section class="features">
+    <div class="feature-box">
+      <h3>💼 Investment Plans</h3>
+      <p>Choose from Free, Premium, and VIP plans and earn up to 60% ROI in 8 months.</p>
     </div>
-    <div class="stat">
-      <h3>$2.3M+</h3>
-      <p>Gold Traded</p>
+    <div class="feature-box">
+      <h3>🔐 KYC Verification</h3>
+      <p>Fast and secure identity verification to ensure safe trading for all users.</p>
     </div>
-    <div class="stat">
-      <h3>3,900</h3>
-      <p>Wallets Linked</p>
+    <div class="feature-box">
+      <h3>📊 Transparent Returns</h3>
+      <p>Track your plan, profits, and returns directly from your personalized dashboard.</p>
     </div>
-  </section>
-
-  <!-- Investment Packages -->
-  <section class="packages">
-    <h2 class="section-title">Investment Packages</h2>
-    <div class="package-cards">
-
-      <div class="card">
-        <h3>Free Plan</h3>
-        <p>8-Month Contract</p>
-        <p><strong>ROI: 20%</strong></p>
-        <p>No upfront cost. Basic returns. Ideal for new users.</p>
-        <a href="{{ url_for('register') }}" class="btn outline">Start Free</a>
-      </div>
-
-      <div class="card highlight">
-        <h3>Premium Plan</h3>
-        <p>8-Month Contract</p>
-        <p><strong>ROI: 40%</strong></p>
-        <p>Mid-level investment. Higher profit potential.</p>
-        <a href="{{ url_for('register') }}" class="btn gold">Invest Now</a>
-      </div>
-
-      <div class="card">
-        <h3>VIP Plan</h3>
-        <p>8-Month Contract</p>
-        <p><strong>ROI: 60%</strong></p>
-        <p>Maximum return plan. Priority support & tracking.</p>
-        <a href="{{ url_for('register') }}" class="btn outline">Join VIP</a>
-      </div>
-
-    </div>
-    <p class="package-note">🎯 After 8 months, 100% of profits go to the investor. Roz Gold holds no ownership.</p>
   </section>
 
   {% include 'partials/footer.html' %}
-
 </body>
 </html>
+
 
 
 
