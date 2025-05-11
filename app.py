@@ -175,6 +175,30 @@ def create_tables():
 if __name__ == '__main__':
     app.run(debug=True)
 
+@app.route('/invest', methods=['GET', 'POST'])
+@login_required
+def invest():
+    plans = InvestmentPlan.query.all()
+
+    if request.method == 'POST':
+        selected_plan = InvestmentPlan.query.get(int(request.form['plan_id']))
+        amount = float(request.form['amount'])
+
+        if amount < selected_plan.min_amount or amount > selected_plan.max_amount:
+            flash("Amount not within allowed range.")
+            return redirect(url_for('invest'))
+
+        roi = selected_plan.roi
+        total_return = amount + (amount * roi / 100)
+
+        # Save to user's record or track separately
+        current_user.returns = total_return
+        db.session.commit()
+
+        flash(f"You've successfully invested ${amount} in the {selected_plan.name} plan!")
+        return redirect(url_for('dashboard'))
+
+    return render_template('invest.html', plans=plans)
 
 
 
