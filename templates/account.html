@@ -1,37 +1,35 @@
+<!-- templates/account.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Edit Account – Roz Gold</title>
+  <meta charset="UTF-8">
+  <title>Update Account – Roz Gold</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   {% include 'partials/navbar.html' %}
+  <div class="container">
+    <h2>Account Info</h2>
+    <form method="POST">
+      <label>Wallet Address:</label>
+      <input type="text" name="wallet" value="{{ user.wallet_address or '' }}" required><br><br>
 
-  <div class="container" style="max-width: 700px; margin: 60px auto; color: #fff;">
-    <h2 style="color: gold;">Manage Your Account</h2>
+      <label>Choose Investment Plan:</label>
+      <select name="plan" required>
+        <option value="Free" {% if user.plan == 'Free' %}selected{% endif %}>Free (20% return)</option>
+        <option value="Premium" {% if user.plan == 'Premium' %}selected{% endif %}>Premium (40% return)</option>
+        <option value="VIP" {% if user.plan == 'VIP' %}selected{% endif %}>VIP (60% return)</option>
+      </select><br><br>
 
-    <form method="POST" style="margin-top: 20px;">
-      <label for="wallet">Wallet Address:</label><br />
-      <input type="text" name="wallet" id="wallet" value="{{ user.wallet_address or '' }}" style="width: 100%; padding: 8px; margin-bottom: 20px;" />
-
-      <label for="plan">Select Plan:</label><br />
-      <select name="plan" id="plan" style="width: 100%; padding: 8px; margin-bottom: 20px;">
-        <option value="Free" {% if user.plan == 'Free' %}selected{% endif %}>Free</option>
-        <option value="Premium" {% if user.plan == 'Premium' %}selected{% endif %}>Premium</option>
-        <option value="VIP" {% if user.plan == 'VIP' %}selected{% endif %}>VIP</option>
-      </select>
-
-      <button type="submit" class="btn btn-warning">Update Account</button>
+      <button type="submit" class="btn">Save</button>
     </form>
 
-    <div style="margin-top: 20px;">
-      <a href="{{ url_for('dashboard') }}" style="color: gold;">← Back to Dashboard</a>
-    </div>
+    <p><strong>Plan:</strong> {{ user.plan }}</p>
+    <p><strong>Expected Returns:</strong> ${{ user.returns or 0.0 }}</p>
   </div>
-
   {% include 'partials/footer.html' %}
 </body>
 </html>
+
 
 
