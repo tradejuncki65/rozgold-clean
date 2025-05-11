@@ -9,78 +9,23 @@
   {% include 'partials/navbar.html' %}
 
   <div class="container">
-    <h2 style="color: #FFD700;">KYC Verification</h2>
+    <h2>KYC Verification</h2>
     <form method="POST" enctype="multipart/form-data">
-      <!-- Personal Info -->
-      <label>Full Name:</label>
-      <input type="text" name="full_name" required>
+      <label>Full Name:</label><br>
+      <input type="text" name="full_name" required><br><br>
 
-      <label>Date of Birth:</label>
-      <input type="date" name="dob" required>
+      <label>National ID:</label><br>
+      <input type="text" name="national_id" required><br><br>
 
-      <label>Nationality:</label>
-      <input type="text" name="nationality" required>
+      <label>Country:</label><br>
+      <input type="text" name="country" required><br><br>
 
-      <!-- Contact Info -->
-      <label>Email Address:</label>
-      <input type="email" name="email" value="{{ user.email }}" readonly>
+      <label>ID Document (PDF or Image):</label><br>
+      <input type="file" name="kyc_document" accept=".jpg,.jpeg,.png,.pdf" required><br><br>
 
-      <label>Phone Number:</label>
-      <input type="text" name="phone" required>
-
-      <label>Residential Address:</label>
-      <textarea name="address" required></textarea>
-
-      <!-- Identification -->
-      <label>Government ID Type:</label>
-      <select name="id_type" required>
-        <option value="">Select</option>
-        <option value="Passport">Passport</option>
-        <option value="National ID">National ID</option>
-        <option value="Driver's License">Driver's License</option>
-      </select>
-
-      <label>ID Number:</label>
-      <input type="text" name="id_number" required>
-
-      <label>Upload ID Document (PDF/JPG/PNG):</label>
-      <input type="file" name="id_doc" required>
-
-      <label>Upload Selfie with ID (JPG/PNG):</label>
-      <input type="file" name="selfie" required>
-
-      <!-- Financial Info -->
-      <label>Source of Funds:</label>
-      <select name="source" required>
-        <option value="Salary">Salary</option>
-        <option value="Business Income">Business Income</option>
-        <option value="Investments">Investments</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label>Estimated Annual Income:</label>
-      <select name="income_range" required>
-        <option value="Under $50,000">Under $50,000</option>
-        <option value="$50,000–$100,000">$50,000–$100,000</option>
-        <option value="Above $100,000">Above $100,000</option>
-      </select>
-
-      <!-- Agreements -->
-      <label>
-        <input type="checkbox" required>
-        I agree to the Terms and Conditions.
-      </label>
-      <label>
-        <input type="checkbox" required>
-        I have read and understood the Privacy Policy.
-      </label>
-
-      <button type="submit" class="btn gold">Submit KYC</button>
+      <button type="submit">Submit KYC</button>
     </form>
-
-    <p style="margin-top: 20px;">Current KYC Status: <strong>{{ user.kyc_status }}</strong></p>
   </div>
-
-  {% include 'partials/footer.html' %}
 </body>
 </html>
+
