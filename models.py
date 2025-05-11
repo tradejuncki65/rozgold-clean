@@ -38,15 +38,15 @@ class Investment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     due_date = db.Column(db.DateTime)
     is_withdrawn = db.Column(db.Boolean, default=False)
+    is_withdrawal_requested = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def status(self):
         if self.is_withdrawn:
             return "Withdrawn"
+        elif self.is_withdrawal_requested:
+            return "Requested"
         elif datetime.utcnow() >= self.due_date:
             return "Matured"
         else:
             return "Pending"
-
-
-
