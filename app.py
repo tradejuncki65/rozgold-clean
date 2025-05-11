@@ -4,16 +4,20 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-import os
+import os, uuid
+from werkzeug.utils import secure_filename
 
 from config import Config
 from models import db, User
 
-# App setup
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 mail = Mail(app)
+
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 login_manager = LoginManager()
 login_manager.login_view = 'login'
@@ -127,11 +131,17 @@ def kyc():
         full_name = request.form['full_name']
         national_id = request.form['national_id']
         country = request.form['country']
+        file = request.files['kyc_document']
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        file.save(filepath)
 
         current_user.full_name = full_name
         current_user.national_id = national_id
         current_user.country = country
         current_user.kyc_status = 'Pending'
+        current_user.kyc_document = unique_filename
         db.session.commit()
 
         send_email(
@@ -152,8 +162,18 @@ def admin_dashboard():
     if not current_user.is_admin:
         flash("Access denied.")
         return redirect(url_for('dashboard'))
-    users = User.query.order_by(User.kyc_status).all()
-    return render_template('admin.html', users=users)
+
+    users = User.query.all()
+    total_users = len(users)
+    kyc_approved = sum(1 for u in users if u.kyc_status == 'Approved')
+    kyc_pending = sum(1 for u in users if u.kyc_status == 'Pending')
+    total_returns = sum(u.returns or 0 for u in users)
+
+    return render_template('admin.html', users=users,
+                           total_users=total_users,
+                           kyc_approved=kyc_approved,
+                           kyc_pending=kyc_pending,
+                           total_returns=total_returns)
 
 @app.route('/admin/kyc/<int:user_id>/<action>')
 @login_required
