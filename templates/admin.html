@@ -1,0 +1,76 @@
+<!-- templates/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard – Roz Gold</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+      background: #111;
+      color: #fff;
+    }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #333;
+      text-align: left;
+    }
+    th {
+      background-color: #FFD700;
+      color: #111;
+    }
+    .action-links a {
+      margin-right: 10px;
+      color: #3498db;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .action-links a.reject {
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  {% include 'partials/navbar.html' %}
+  <div class="container">
+    <h2>Admin Panel – User Management</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Wallet</th>
+          <th>Plan</th>
+          <th>Returns</th>
+          <th>KYC</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.wallet_address or "—" }}</td>
+          <td>{{ user.plan or "—" }}</td>
+          <td>${{ user.returns or 0.0 }}</td>
+          <td>{{ user.kyc_status }}</td>
+          <td class="action-links">
+            {% if user.kyc_status == 'Pending' %}
+              <a href="{{ url_for('admin_kyc_action', user_id=user.id, action='approve') }}">Approve</a>
+              <a href="{{ url_for('admin_kyc_action', user_id=user.id, action='reject') }}" class="reject">Reject</a>
+            {% else %}
+              <span>{{ user.kyc_status }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
