@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Invest in a Plan</h2>
+<form method="POST">
+  <label>Select Plan:</label>
+  <select name="plan_id" required>
+    {% for plan in plans %}
+      <option value="{{ plan.id }}">{{ plan.name }} – ROI: {{ plan.roi }}%, Min: ${{ plan.min_amount }}, Max: ${{ plan.max_amount }}</option>
+    {% endfor %}
+  </select><br>
+
+  <label>Enter Amount:</label>
+  <input type="number" name="amount" step="0.01" required><br>
+
+  <button type="submit">Invest Now</button>
+</form>
+{% endblock %}
