@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>My Investment History</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Plan</th>
+      <th>Amount ($)</th>
+      <th>ROI (%)</th>
+      <th>Invested On</th>
+      <th>Due Date</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for inv in investments %}
+    <tr>
+      <td>{{ inv.plan }}</td>
+      <td>{{ "%.2f"|format(inv.amount) }}</td>
+      <td>{{ inv.roi }}</td>
+      <td>{{ inv.created_at.strftime('%Y-%m-%d') }}</td>
+      <td>{{ inv.due_date.strftime('%Y-%m-%d') }}</td>
+      <td>{{ inv.status() }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No investments yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
