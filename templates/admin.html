@@ -1,4 +1,3 @@
-<!-- templates/admin.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +45,8 @@
           <th>Wallet</th>
           <th>Plan</th>
           <th>Returns</th>
-          <th>KYC</th>
+          <th>KYC Status</th>
+          <th>Document</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -59,6 +59,13 @@
           <td>{{ user.plan or "—" }}</td>
           <td>${{ user.returns or 0.0 }}</td>
           <td>{{ user.kyc_status }}</td>
+          <td>
+            {% if user.kyc_document %}
+              <a href="{{ url_for('static', filename='uploads/' ~ user.kyc_document) }}" target="_blank">View</a>
+            {% else %}
+              —
+            {% endif %}
+          </td>
           <td class="action-links">
             {% if user.kyc_status == 'Pending' %}
               <a href="{{ url_for('admin_kyc_action', user_id=user.id, action='approve') }}">Approve</a>
@@ -74,3 +81,4 @@
   </div>
 </body>
 </html>
+
