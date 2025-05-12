@@ -33,6 +33,33 @@
 </body>
 </html>
 
+<canvas id="roiChart" width="400" height="200"></canvas>
+
+<script>
+  const ctx = document.getElementById('roiChart').getContext('2d');
+  const roiChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Total Invested', 'ROI Earned', 'Withdrawn'],
+      datasets: [{
+        label: 'USD',
+        data: [
+          {{ total_invested|default(0, true) }},
+          {{ total_roi_earned|default(0, true) }},
+          {{ total_withdrawn|default(0, true) }}
+        ],
+        backgroundColor: ['#ffc107', '#28a745', '#007bff']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        title: { display: true, text: 'Investment Overview' }
+      }
+    }
+  });
+</script>
 
 
 
