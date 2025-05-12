@@ -92,21 +92,7 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    investments = Investment.query.filter_by(user_id=current_user.id).all()
-
-    total_invested = sum(inv.amount for inv in investments)
-    total_roi_earned = sum((inv.amount * inv.roi / 100) for inv in investments if inv.status() == "Matured")
-    total_withdrawn = sum((inv.amount * inv.roi / 100) for inv in investments if inv.is_withdrawn)
-    active_investments = len([inv for inv in investments if inv.status() == "Pending"])
-
-    return render_template('dashboard.html',
-        user=current_user,
-        total_invested=total_invested,
-        total_roi_earned=total_roi_earned,
-        total_withdrawn=total_withdrawn,
-        active_investments=active_investments
-    )
-
+    return render_template('dashboard.html', user=current_user)
 
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
@@ -140,7 +126,6 @@ def admin_dashboard():
     total_users = len(users)
     kyc_pending = User.query.filter_by(kyc_status='Pending').count()
     kyc_approved = User.query.filter_by(kyc_status='Approved').count()
-
     total_invested = db.session.query(db.func.sum(Investment.amount)).scalar() or 0
     active_investments = Investment.query.filter(Investment.is_withdrawn == False).count()
     pending_withdrawals = Investment.query.filter_by(is_withdrawal_requested=True).count()
@@ -154,7 +139,6 @@ def admin_dashboard():
         pending_withdrawals=pending_withdrawals,
         users=users
     )
-
 
 @app.route('/admin/verify/<int:user_id>/<status>')
 @login_required
@@ -276,8 +260,17 @@ def complete_withdrawal(investment_id):
     flash("Withdrawal marked as completed.")
     return redirect(url_for('admin_withdrawals'))
 
+# ---------- TEMP ROUTE TO CREATE DB ---------- #
+@app.route('/init-db')
+def init_db():
+    db.create_all()
+    return "Database tables created!"
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
+
 
 
 
