@@ -92,7 +92,21 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', user=current_user)
+    investments = Investment.query.filter_by(user_id=current_user.id).all()
+
+    total_invested = sum(inv.amount for inv in investments)
+    total_roi_earned = sum((inv.amount * inv.roi / 100) for inv in investments if inv.status() == "Matured")
+    total_withdrawn = sum((inv.amount * inv.roi / 100) for inv in investments if inv.is_withdrawn)
+    active_investments = len([inv for inv in investments if inv.status() == "Pending"])
+
+    return render_template('dashboard.html',
+        user=current_user,
+        total_invested=total_invested,
+        total_roi_earned=total_roi_earned,
+        total_withdrawn=total_withdrawn,
+        active_investments=active_investments
+    )
+
 
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
