@@ -7,7 +7,7 @@ class Config:
 
     # Mail Configuration
     MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465
+    MAIL_PORT = 587
     MAIL_USE_SSL = True
     MAIL_USERNAME = 'tradejunction65@gmail.com'
     MAIL_PASSWORD = 'rtbu updz dugu hsxd ' 
